@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
+import 'package:confetti/confetti.dart';
 import 'package:expenseapp/Widgets/chart.dart';
 import 'package:expenseapp/Widgets/new_transaction.dart';
 import 'package:expenseapp/Widgets/transactions_list.dart';
@@ -53,9 +55,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
+  ConfettiController _controllerBottomCenter;
+  ConfettiController _controllerTopCenter;
   @override
   void initState() {
+     _controllerBottomCenter = ConfettiController(duration: const Duration(seconds: 4));
+     _controllerTopCenter = ConfettiController(duration: const Duration(seconds: 4));
+
     super.initState();
    widget.storage.localPath.then((path) =>{
       _appDir = path
@@ -122,6 +128,11 @@ class _MyHomePageState extends State<MyHomePage> {
       displayedTransactions = transactions.where((t) => t.date.month == selectedMonth.value).toList();
       displayedTransactions.sort((a,b) => a.date.compareTo(b.date));
       saveData(transactions);
+      if(displayedTransactions.length == 1)
+      {
+         _controllerBottomCenter.play();
+        // _controllerTopCenter.play();
+      }
     });
   }
 
@@ -193,6 +204,19 @@ class _MyHomePageState extends State<MyHomePage> {
     final body = SafeArea(child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          Align(
+          alignment: Alignment.topCenter,
+          
+          child: ConfettiWidget(
+            confettiController: _controllerTopCenter,
+            blastDirection: pi / 2,
+            maxBlastForce: 5, // set a lower max blast force
+            minBlastForce: 2, // set a lower min blast force
+            emissionFrequency: 0.05,
+            numberOfParticles: 30, // a lot of particles at once
+            gravity: .3,
+          ),
+        ),
          if(!isLanscape)Container(margin: EdgeInsets.only(right: mediaQuery.size.width *.06, left: mediaQuery.size.width *.06), height: mediaQuery.size.height *.05, padding: EdgeInsets.only(top: 2), alignment: Alignment.topCenter, child: Row(
            mainAxisAlignment: MainAxisAlignment.spaceBetween,
            children: <Widget>[
@@ -216,6 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
          ? Container(height:(mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: Chart(_recentTransactions.toList()))
          : Column(
            children: <Widget>[
+            
             Container(
               padding: EdgeInsets.all(10),
               child: Row(
@@ -236,7 +261,29 @@ class _MyHomePageState extends State<MyHomePage> {
             ),             
              transactionListWidget,
            ],
-         )
+         ),
+             Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ConfettiWidget(
+                    confettiController: _controllerBottomCenter,
+                     colors: const [
+                      Colors.green,
+                      Colors.blue,
+                      Colors.pink,
+                      Colors.orange,
+                      Colors.purple
+                    ],
+                    blastDirection: -pi/2,
+                    emissionFrequency: 0.03,
+                    numberOfParticles: 30,
+                    maxBlastForce: 100,
+                    minBlastForce: 30,
+                    blastDirectionality: BlastDirectionality.directional,
+                    gravity: 0.3,
+                    shouldLoop: false,
+                  ),
+        ),
+         
         ],
        ),
       )
@@ -249,5 +296,12 @@ class _MyHomePageState extends State<MyHomePage> {
       
     );
   }
+  @override
+  void dispose() {
+    _controllerBottomCenter.dispose();
+    super.dispose();
+  }
 }
+
+
 
