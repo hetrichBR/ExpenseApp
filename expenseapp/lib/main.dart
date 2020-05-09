@@ -221,7 +221,7 @@ class _MyHomePageState extends State<MyHomePage> {
          if(!isLanscape)Container(margin: EdgeInsets.only(right: mediaQuery.size.width *.06, left: mediaQuery.size.width *.06), height: mediaQuery.size.height *.05, padding: EdgeInsets.only(top: 2), alignment: Alignment.topCenter, child: Row(
            mainAxisAlignment: MainAxisAlignment.spaceBetween,
            children: <Widget>[
-             (Platform.isIOS ? Container(width:200,height:100,child:CupertinoPicker(scrollController: FixedExtentScrollController(initialItem: selectedMonth.value), backgroundColor: Colors.white,itemExtent: 30, onSelectedItemChanged: (int index){onChangeMonths(_months[index]);}, children: List<Widget>.generate(12, (index){return new Center(child: Text('${_months[index].name}'));}))): DropdownButton(value: selectedMonth, items: _dropDownItems, onChanged: onChangeMonths)),
+             (Platform.isIOS ? Container(width:200,height:100,child:CupertinoPicker(scrollController: FixedExtentScrollController(initialItem: selectedMonth.value - 1), backgroundColor: Colors.white,itemExtent: 30, onSelectedItemChanged: (int index){onChangeMonths(_months[index]);}, children: List<Widget>.generate(12, (index){return new Center(child: Text('${_months[index].name}'));}))): DropdownButton(value: selectedMonth, items: _dropDownItems, onChanged: onChangeMonths)),
              //Text('<Month>', style: Theme.of(context).textTheme.title),
              Row(children: <Widget>[
                 Container(padding: EdgeInsets.all(5), child: Image.asset('assets/images/money-coin-label-simple.png', fit: BoxFit.cover)),
