@@ -1,4 +1,4 @@
-package com.example.expenseapp
+package com.bkbstudio.expenseapp
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

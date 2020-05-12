@@ -10,13 +10,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'Models/transaction.dart';
 import 'Widgets/expenses_overview.dart';
 import 'Widgets/month_list.dart';
 import 'storage.dart';
-import 'package:path/path.dart' as path;
 
 
 void main() {
@@ -199,8 +197,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final mediaQuery = MediaQuery.of(context);
     final isLanscape = mediaQuery.orientation == Orientation.landscape;
     final PreferredSizeWidget appBar = Platform.isIOS 
-    ? CupertinoNavigationBar(middle: Text('Track Your Expenses'), trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[GestureDetector(onTap: () => _startNewTransaction(context), child: Icon(CupertinoIcons.add),)],),) 
-    : AppBar(title: Text('Track Your Expenses'), actions: <Widget>[IconButton(icon: Icon(Icons.add), onPressed: () => _startNewTransaction(context))],);
+    ? CupertinoNavigationBar(middle: const Text('Track Your Expenses'), trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[GestureDetector(onTap: () => _startNewTransaction(context), child: Icon(CupertinoIcons.add),)],),) 
+    : AppBar(title: const Text('Track Your Expenses'), actions: <Widget>[IconButton(icon: Icon(Icons.add), onPressed: () => _startNewTransaction(context))],);
     final transactionListWidget = Container(height: (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: TransactionList(displayedTransactions, _deleteTransaction));
     final body = SafeArea(child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -290,6 +288,7 @@ class _MyHomePageState extends State<MyHomePage> {
       )
       );
     return Platform.isIOS ? CupertinoPageScaffold(child: body, navigationBar: appBar,) : Scaffold(
+      resizeToAvoidBottomPadding: true,
       appBar: appBar,
       body: body,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
