@@ -199,7 +199,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final PreferredSizeWidget appBar = Platform.isIOS 
     ? CupertinoNavigationBar(middle: const Text('Track Your Expenses'), trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[GestureDetector(onTap: () => _startNewTransaction(context), child: Icon(CupertinoIcons.add),)],),) 
     : AppBar(title: const Text('Track Your Expenses'), actions: <Widget>[IconButton(icon: Icon(Icons.add), onPressed: () => _startNewTransaction(context))],);
-    final transactionListWidget = Container(height: (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: TransactionList(displayedTransactions, _deleteTransaction));
+    final transactionListWidget = Container(height: (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: TransactionList(displayedTransactions, _deleteTransaction, selectedMonth.value));
     final body = SafeArea(child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[

@@ -6,8 +6,9 @@ class TransactionList extends StatelessWidget {
 
   final List<Transaction> transactions;
   final Function deleteTransactionRef;
+  final int selectedMonth;
 
-  TransactionList(this.transactions, this.deleteTransactionRef);
+  TransactionList(this.transactions, this.deleteTransactionRef, this.selectedMonth);
   
     @override
     Widget build(BuildContext context) {
@@ -21,9 +22,10 @@ class TransactionList extends StatelessWidget {
         {
           return Column(
             children: <Widget>[
+            selectedMonth == DateTime.now().month ? SizedBox(height: 0,) : SizedBox(height: constraints.maxHeight * .2,),
             Text('No transactions added yet!', style: Theme.of(context).textTheme.title),
             SizedBox(height: 30,),
-            Container(height: constraints.maxHeight * .6, child: Image.asset('assets/images/panda-asleep.png', fit: BoxFit.cover,))
+            Container(height: selectedMonth == DateTime.now().month ? constraints.maxHeight * .6 : constraints.maxHeight * .4, child: Image.asset('assets/images/panda-asleep.png', fit: BoxFit.cover,))
             ],
           );
         })

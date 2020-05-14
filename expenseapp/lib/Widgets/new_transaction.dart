@@ -102,7 +102,7 @@ class _NewTransactionState extends State<NewTransaction> {
                           ),
                         ],
                       ),
-                      selectedDate == null || amountController.text == '' || titleController.text == '' ? Container(): Container(width: mediaQuery.size.width, alignment: Alignment.centerRight,child: Container(width: mediaQuery.size.width, child: RaisedButton(child: Text('Add Transaction', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),), color:Theme.of(context).primaryColor, textColor: Theme.of(context).textTheme.button.color, onPressed: submitData))),
+                      selectedDate == null ? Container(): Container(width: mediaQuery.size.width, alignment: Alignment.centerRight,child: Container(width: mediaQuery.size.width, child: RaisedButton(child: Text('Add Transaction', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),), color:Theme.of(context).primaryColor, textColor: Theme.of(context).textTheme.button.color, onPressed: submitData))),
                     ]),
                     )
                   ),
