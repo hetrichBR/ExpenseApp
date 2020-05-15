@@ -8,7 +8,8 @@ import 'package:intl/intl.dart';
 class NewTransaction extends StatefulWidget {
 
   final Function addTransactionRef;
-  NewTransaction(this.addTransactionRef);
+  final int dayOfWeek;
+  NewTransaction(this.addTransactionRef, this.dayOfWeek);
 
   @override
   _NewTransactionState createState() => _NewTransactionState();
@@ -18,11 +19,18 @@ class _NewTransactionState extends State<NewTransaction> {
   final titleController = TextEditingController();
   final amountController = TextEditingController();
   bool isEssential = true;
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate;
+  
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    widget.dayOfWeek == null ? selectedDate = DateTime.now(): getDayOfWeek(widget.dayOfWeek);
+  }
 
   void _presentDatePicker()
   {
-    showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime(DateTime.now().year), lastDate: DateTime.now(), )
+    showDatePicker(context: context, initialDate: selectedDate == null ? DateTime.now() : selectedDate, firstDate: DateTime(DateTime.now().year), lastDate: DateTime.now(), )
        .then((date) {
          if(date == null){
            return;
@@ -47,8 +55,20 @@ class _NewTransactionState extends State<NewTransaction> {
     Navigator.of(context).pop();
   }
 
+  void getDayOfWeek(int day){
+     var now = DateTime.now();
+     while(now.weekday != day)
+     {
+       now = now.subtract(new Duration(days: 1));
+     }
+       selectedDate = now; 
+      if(day == 5 || day == 6 || day == 7 /*Sunday*/)
+          selectedDate = selectedDate.add(new Duration(days: 7));  
+  }
+
   @override
   Widget build(BuildContext context) {
+    print(widget.dayOfWeek);
       final mediaQuery = MediaQuery.of(context);
       final isLandscape = mediaQuery.orientation == Orientation.landscape;
       return SingleChildScrollView(

@@ -182,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
   
   void _startNewTransaction(BuildContext context)
   {
-    showModalBottomSheet(context: context, isScrollControlled: true, builder: (bContext){ return NewTransaction(_addNewTransaction);}, backgroundColor: Theme.of(context).primaryColor);
+    showModalBottomSheet(context: context, isScrollControlled: true, builder: (bContext){ return NewTransaction(_addNewTransaction, null);}, backgroundColor: Theme.of(context).primaryColor);
   }
 
   void _viewStats(BuildContext context)
@@ -233,10 +233,10 @@ class _MyHomePageState extends State<MyHomePage> {
            ],
          )),
          if(isLanscape) Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[Text('Show Chart', style: Theme.of(context).textTheme.title,), Switch.adaptive(value: showChart, onChanged: (val){setState(() {showChart = val;});})],),
-         if(!isLanscape && selectedMonth.value == DateTime.now().month) Container(height:(mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.3, child: Chart(_recentTransactions.toList())),
+         if(!isLanscape && selectedMonth.value == DateTime.now().month) Container(height:(mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.3, child: Chart(_recentTransactions.toList(), _addNewTransaction)),
          if(!isLanscape) Container(height:selectedMonth.value == DateTime.now().month ? (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.6 : (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.9, child: transactionListWidget),
          if(isLanscape) showChart 
-         ? Container(height:(mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: Chart(_recentTransactions.toList()))
+         ? Container(height:(mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: Chart(_recentTransactions.toList(), _addNewTransaction))
          : Column(
            children: <Widget>[
             
