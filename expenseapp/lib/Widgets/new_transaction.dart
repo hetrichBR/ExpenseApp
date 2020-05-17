@@ -62,7 +62,7 @@ class _NewTransactionState extends State<NewTransaction> {
        now = now.subtract(new Duration(days: 1));
      }
        selectedDate = now; 
-      if(day == 5 || day == 6 || day == 7 /*Sunday*/)
+      if(day > DateTime.now().weekday)
           selectedDate = selectedDate.add(new Duration(days: 7));  
   }
 

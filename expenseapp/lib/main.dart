@@ -53,13 +53,41 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   ConfettiController _controllerBottomCenter;
   ConfettiController _controllerTopCenter;
+  AnimationController animationControllerChart;
+  AnimationController animationControllerList;
+  Animation<Offset> _offsetAnimationList;
+  Animation<Offset> _offsetAnimationChart;
+  GlobalKey<AnimatedListState> _animatedListKey;
+
+  
+
   @override
   void initState() {
      _controllerBottomCenter = ConfettiController(duration: const Duration(seconds: 4));
      _controllerTopCenter = ConfettiController(duration: const Duration(seconds: 4));
+     animationControllerChart = AnimationController(vsync: this, duration: const Duration(seconds: 3));
+     animationControllerList = AnimationController(vsync: this, duration: const Duration(seconds: 3));
+    _animatedListKey = GlobalKey<AnimatedListState>();
+
+
+     _offsetAnimationList = Tween<Offset>(
+      begin: Offset(-1.0, 0.0),
+      end: const Offset(0.0, 0.0),
+    ).animate(CurvedAnimation(
+      parent: animationControllerList,
+      curve: Curves.fastOutSlowIn,
+    ));
+
+    _offsetAnimationChart = Tween<Offset>(
+      begin: Offset(0.0, -1.1),
+      end: const Offset(0.0, 0.0),
+    ).animate(CurvedAnimation(
+      parent: animationControllerChart,
+      curve: Curves.fastOutSlowIn,
+    ));
 
     super.initState();
    widget.storage.localPath.then((path) =>{
@@ -68,6 +96,19 @@ class _MyHomePageState extends State<MyHomePage> {
     widget.storage.readData().then((data) => {
       readData(data)
     });
+
+    animationControllerChart.forward();
+    animationControllerList.forward();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controllerBottomCenter.dispose();
+    _controllerTopCenter.dispose();
+    animationControllerChart.dispose();
+    animationControllerList.dispose();
+
   }
 
   String _appDir;
@@ -101,8 +142,55 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
         transactionDisplayMonth = selection.value;
         selectedMonth = selection;
+        //remove items from animated list
+        for(int i = 0; i < displayedTransactions.length - 1; i++)
+        {
+           if(displayedTransactions.length > 0)
+           {  
+              if(_animatedListKey.currentState != null)
+              _animatedListKey.currentState.removeItem(i, (context, animation){
+              return SizedBox();
+              });
+           }
+        }
+        print(_animatedListKey.currentState);
         displayedTransactions = transactions.where((t) => t.date.month == transactionDisplayMonth).toList();
         displayedTransactions.sort((a,b) => a.date.compareTo(b.date));
+
+        //add items from animated list
+        for(int i = 0; i < displayedTransactions.length -1; i++)
+        {
+          if(displayedTransactions.length > 0)
+           {
+              if(_animatedListKey.currentState != null)
+                _animatedListKey.currentState.insertItem(0);
+           }
+        }
+        print(_animatedListKey);
+        print(_animatedListKey.currentState);
+
+        if(displayedTransactions.length != 0)
+        {
+            if(selectedMonth.value == DateTime.now().month)
+            {
+              animationControllerChart.forward(from: 0);
+              animationControllerList.forward(from: 0);
+            }
+
+            else
+            {
+              animationControllerChart.reverse();
+              animationControllerList.forward(from: 0); 
+            }
+        }
+        else{
+          if(selectedMonth.value == DateTime.now().month)
+            {
+              animationControllerChart.forward(from: 0);
+            }
+        }
+       
+
     });
   }
 
@@ -124,6 +212,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final newTransaction = Transaction(title: title, amount: amount, date: date, id: UniqueKey().hashCode, isEssential: isEssential);
     setState(() {
       transactions.add(newTransaction);
+      if(_animatedListKey.currentState != null)
+        _animatedListKey.currentState.insertItem(0);
       displayedTransactions = transactions.where((t) => t.date.month == selectedMonth.value).toList();
       displayedTransactions.sort((a,b) => a.date.compareTo(b.date));
       saveData(transactions);
@@ -132,6 +222,7 @@ class _MyHomePageState extends State<MyHomePage> {
          _controllerBottomCenter.play();
         // _controllerTopCenter.play();
       }
+      //animationController.forward();
     });
   }
 
@@ -173,7 +264,11 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
   _deleteTransaction(int id){
+    int indexToDelete = displayedTransactions.indexWhere((t)=> id == t.id);
     setState(() {
+      _animatedListKey.currentState.removeItem(indexToDelete, (context, animation){
+        return SizedBox();
+      });
       transactions.removeWhere((t)=> id == t.id);
       displayedTransactions.removeWhere((t)=> id == t.id);
       saveData(transactions);
@@ -197,9 +292,9 @@ class _MyHomePageState extends State<MyHomePage> {
     final mediaQuery = MediaQuery.of(context);
     final isLanscape = mediaQuery.orientation == Orientation.landscape;
     final PreferredSizeWidget appBar = Platform.isIOS 
-    ? CupertinoNavigationBar(middle: const Text('Track Your Expenses'), trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[GestureDetector(onTap: () => _startNewTransaction(context), child: Icon(CupertinoIcons.add),)],),) 
-    : AppBar(title: const Text('Track Your Expenses'), actions: <Widget>[IconButton(icon: Icon(Icons.add), onPressed: () => _startNewTransaction(context))],);
-    final transactionListWidget = Container(height: (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: TransactionList(displayedTransactions, _deleteTransaction, selectedMonth.value));
+    ? CupertinoNavigationBar(middle: const Text('Expense Helper'), trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[GestureDetector(onTap: () => _startNewTransaction(context), child: Icon(CupertinoIcons.add),)],),) 
+    : AppBar(title: const Text('Expense Helper'), actions: <Widget>[IconButton(icon: Icon(Icons.add), onPressed: () => _startNewTransaction(context))],);
+    final transactionListWidget = Container(height: (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: SlideTransition(position: _offsetAnimationList, child: TransactionList(displayedTransactions, _deleteTransaction, selectedMonth.value, _offsetAnimationList, _animatedListKey)));
     final body = SafeArea(child: SingleChildScrollView(child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
@@ -223,17 +318,26 @@ class _MyHomePageState extends State<MyHomePage> {
              //Text('<Month>', style: Theme.of(context).textTheme.title),
              Row(children: <Widget>[
                 Container(padding: EdgeInsets.all(5), child: Image.asset('assets/images/money-coin-label-simple.png', fit: BoxFit.cover)),
-                RichText(text: TextSpan(style:Theme.of(context).textTheme.title, 
-                  children: <TextSpan>
-                  [
-                    TextSpan(text: "${formatCurrency.format(totalMonthExpenses)}", style: TextStyle(color: Theme.of(context).primaryColor))
-                  ]))
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 700),
+                  transitionBuilder: (Widget child, Animation<double> animation) {
+                    return ScaleTransition(child: child, scale: animation);
+                  },
+                  child: RichText(
+                    key: ValueKey<int>(totalMonthExpenses.round()),
+                    text: TextSpan(style:Theme.of(context).textTheme.title, 
+                    children: <TextSpan>
+                    [
+                      TextSpan(text: "${formatCurrency.format(totalMonthExpenses)}", style: TextStyle(color: Theme.of(context).primaryColor)),
+
+                    ])),
+                )
                 ],)
             ,
            ],
          )),
          if(isLanscape) Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[Text('Show Chart', style: Theme.of(context).textTheme.title,), Switch.adaptive(value: showChart, onChanged: (val){setState(() {showChart = val;});})],),
-         if(!isLanscape && selectedMonth.value == DateTime.now().month) Container(height:(mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.3, child: Chart(_recentTransactions.toList(), _addNewTransaction)),
+         if(!isLanscape && selectedMonth.value == DateTime.now().month) Container(height:(mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.3, child: SlideTransition(position: _offsetAnimationChart, child: Chart(_recentTransactions.toList(), _addNewTransaction))),
          if(!isLanscape) Container(height:selectedMonth.value == DateTime.now().month ? (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.6 : (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.9, child: transactionListWidget),
          if(isLanscape) showChart 
          ? Container(height:(mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: Chart(_recentTransactions.toList(), _addNewTransaction))
@@ -295,11 +399,6 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: Platform.isIOS || isLanscape ? Container() : FloatingActionButton(child: Image.asset('assets/images/money-coin.png', fit: BoxFit.cover,), onPressed: () => _startNewTransaction(context)),
       
     );
-  }
-  @override
-  void dispose() {
-    _controllerBottomCenter.dispose();
-    super.dispose();
   }
 }
 
