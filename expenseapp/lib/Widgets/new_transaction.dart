@@ -30,7 +30,7 @@ class _NewTransactionState extends State<NewTransaction> {
 
   void _presentDatePicker()
   {
-    showDatePicker(context: context, initialDate: selectedDate == null ? DateTime.now() : selectedDate, firstDate: DateTime(DateTime.now().year), lastDate: DateTime.now(), )
+    showDatePicker(context: context, initialDate: selectedDate == null ? DateTime.now() : selectedDate, firstDate: DateTime(DateTime.now().year), lastDate: new DateTime(DateTime.now().year, 12,31), )
        .then((date) {
          if(date == null){
            return;

@@ -68,8 +68,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   void initState() {
      _controllerBottomCenter = ConfettiController(duration: const Duration(seconds: 4));
      _controllerTopCenter = ConfettiController(duration: const Duration(seconds: 4));
-     animationControllerChart = AnimationController(vsync: this, duration: const Duration(seconds: 3));
-     animationControllerList = AnimationController(vsync: this, duration: const Duration(seconds: 3));
+     animationControllerChart = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+     animationControllerList = AnimationController(vsync: this, duration: const Duration(seconds: 2));
     _animatedListKey = GlobalKey<AnimatedListState>();
 
 
@@ -139,16 +139,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   onChangeMonths(Month selection)
   {
+    int currentMonth;
+    if(transactions.length > 0)
+      currentMonth = transactions[0].date.month;
+
     setState(() {
         transactionDisplayMonth = selection.value;
         selectedMonth = selection;
         //remove items from animated list
         for(int i = 0; i < displayedTransactions.length - 1; i++)
         {
-           if(displayedTransactions.length > 0)
+           if(displayedTransactions.length > 0 || currentMonth != selectedMonth.value)
            {  
               if(_animatedListKey.currentState != null)
-              _animatedListKey.currentState.removeItem(i, (context, animation){
+              _animatedListKey.currentState.removeItem(0, (context, animation){
               return SizedBox();
               });
            }
@@ -160,7 +164,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         //add items from animated list
         for(int i = 0; i < displayedTransactions.length -1; i++)
         {
-          if(displayedTransactions.length > 0)
+          if(displayedTransactions.length > 0 || currentMonth != selectedMonth.value)
            {
               if(_animatedListKey.currentState != null)
                 _animatedListKey.currentState.insertItem(0);
@@ -212,10 +216,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     final newTransaction = Transaction(title: title, amount: amount, date: date, id: UniqueKey().hashCode, isEssential: isEssential);
     setState(() {
       transactions.add(newTransaction);
-      if(_animatedListKey.currentState != null)
-        _animatedListKey.currentState.insertItem(0);
+    
       displayedTransactions = transactions.where((t) => t.date.month == selectedMonth.value).toList();
       displayedTransactions.sort((a,b) => a.date.compareTo(b.date));
+      if(_animatedListKey.currentState != null && newTransaction.date.month == selectedMonth.value)
+         _animatedListKey.currentState.insertItem(displayedTransactions.indexWhere((t) => t.id == newTransaction.id));
       saveData(transactions);
       if(displayedTransactions.length == 1)
       {
