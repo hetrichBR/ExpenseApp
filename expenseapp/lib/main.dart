@@ -298,7 +298,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     final mediaQuery = MediaQuery.of(context);
     final isLanscape = mediaQuery.orientation == Orientation.landscape;
     final PreferredSizeWidget appBar = Platform.isIOS 
-    ? CupertinoNavigationBar(middle: const Text('Expense Helper'), trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[GestureDetector(onTap: () => {gridView = !gridView}, child: Icon(CupertinoIcons.book),), GestureDetector(onTap: () => _startNewTransaction(context), child: Icon(CupertinoIcons.add),)],),) 
+    ? CupertinoNavigationBar(middle: const Text('Expense Helper'), trailing: Row(mainAxisSize: MainAxisSize.min, children: <Widget>[GestureDetector(onTap: () => {setState(() {gridView = !gridView;})}, child: Icon(CupertinoIcons.news),), GestureDetector(onTap: () => _startNewTransaction(context), child: Icon(CupertinoIcons.add),)],),) 
     : AppBar(title: const Text('Expense Helper'), actions: <Widget>[IconButton(icon: Icon(Icons.list), onPressed: () => {setState(() {gridView = !gridView;})}), IconButton(icon: Icon(Icons.add), onPressed: () => _startNewTransaction(context))],);
     final transactionListWidget = Container(height: (mediaQuery.size.height - appBar.preferredSize.height - mediaQuery.padding.top) *.7, child: SlideTransition(position: _offsetAnimationList, child: TransactionList(displayedTransactions, _deleteTransaction, selectedMonth.value, _offsetAnimationList, _animatedListKey, gridView)));
     final body = SafeArea(child: SingleChildScrollView(child: Column(
